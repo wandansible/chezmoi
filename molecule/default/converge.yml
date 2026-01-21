@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include wandansible.chezmoi"
+      ansible.builtin.include_role:
+        name: "wandansible.chezmoi"
+      vars:
+        chezmoi_github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"

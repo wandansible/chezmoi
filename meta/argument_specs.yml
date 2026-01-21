@@ -1,0 +1,136 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure chezmoi for managing dotfiles
+    options:
+      chezmoi_arch_map:
+        description: |
+          Mapping of the possible values of ansible_architecture
+          to the chezmoi package architectures
+        type: dict
+
+      chezmoi_github_org:
+        description: Name of organisation for chezmoi github repository
+        type: str
+        default: twpayne
+
+      chezmoi_github_repo:
+        description: Name of chezmoi github repository
+        type: str
+        default: chezmoi
+
+      chezmoi_github_token:
+        description: Optional bearer token to use to authenticate with api.github.com
+        type: str
+        default: ""
+
+      chezmoi_version:
+        description: Version to install (use "latest" for the latest version)
+        type: str
+        default: latest
+
+      chezmoi_install:
+        description: If true, install chezmoi
+        type: bool
+        default: true
+
+      chezmoi_init_args:
+        description: Extra arguments to use when initialising a chezmoi repo
+        type: str
+        default: ""
+
+      chezmoi_init_apply:
+        description: If true, run chezmoi apply when initialising a chezmoi repo
+        type: bool
+        default: true
+
+      chezmoi_update_eeprom_time:
+        description: |
+          How often to update a users chezmoi repo, accepts a systemd time,
+          see https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
+          or "never"
+        type: str
+        default: "daily"
+
+      chezmoi_update_eeprom_randomized_delay:
+        description: |
+          Delay the chezmoi repo update timer by a random time up
+          to this value or empty string for no delay
+        type: str
+        default: "6h"
+
+      chezmoi_update_args:
+        description: Extra arguments to use when updating a chezmoi repo
+        type: str
+        default: ""
+
+      users:
+        description: List of user accounts to manage dotfiles for
+        type: list
+        elements: dict
+        default: []
+        options:
+          username:
+            description: Name of the user account
+            type: str
+            required: true
+          repo:
+            description: Location of the users dotfile repo
+            type: str
+            required: true
+          prompts:
+            description: Answers for chezmoi prompts
+            type: dict
+            options:
+              bool:
+                description: Boolean answers
+                type: list
+                elements: dict
+                options:
+                  key:
+                    description: Prompt name
+                    type: str
+                    required: true
+                  value:
+                    description: Prompt value
+                    type: str
+                    required: true
+              choice:
+                description: Choice answers
+                type: list
+                elements: dict
+                options:
+                  key:
+                    description: Prompt name
+                    type: str
+                    required: true
+                  value:
+                    description: Prompt value
+                    type: str
+                    required: true
+              multichoice:
+                description: Multichoice answers
+                type: list
+                elements: dict
+                options:
+                  key:
+                    description: Prompt name
+                    type: str
+                    required: true
+                  value:
+                    description: Prompt value
+                    type: str
+                    required: true
+              string:
+                description: String answers
+                type: list
+                elements: dict
+                options:
+                  key:
+                    description: Prompt name
+                    type: str
+                    required: true
+                  value:
+                    description: Prompt value
+                    type: str
+                    required: true
