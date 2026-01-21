@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description="Update chezmoi repo"
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/chezmoi update {{ chezmoi_update_args }}
+
+[Install]
+WantedBy=multi-user.target

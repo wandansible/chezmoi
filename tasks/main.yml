@@ -1,0 +1,11 @@
+---
+- name: Install chezmoi
+  ansible.builtin.import_tasks:
+    file: install.yml
+
+- name: Initialise chezmoi repo
+  ansible.builtin.include_tasks:
+    file: repo.yml
+  loop: "{{ chezmoi_users }}"
+  loop_control:
+    label: "{{ item.username }}"

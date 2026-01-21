@@ -1,0 +1,24 @@
+---
+chezmoi_arch_map:
+  x86_64: amd64
+  i386: i386
+  aarch64: arm64
+  armv7l: armel
+  armv6l: armel
+
+chezmoi_github_org: twpayne
+chezmoi_github_repo: chezmoi
+chezmoi_github_token: ""
+
+chezmoi_version: "latest"
+
+chezmoi_install: "true"
+
+chezmoi_init_args: ""
+chezmoi_init_apply: "true"
+
+chezmoi_update_time: "daily"
+chezmoi_update_randomized_delay: "6h"
+chezmoi_update_args: ""
+
+chezmoi_users: []

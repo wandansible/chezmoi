@@ -1,0 +1,62 @@
+---
+- name: "Initialise repo"
+  vars:
+    _chezmoi_args: |-
+      {% if chezmoi_init_args != "" -%}
+      {{ chezmoi_init_args + " " }}
+      {%- endif %}
+      {% if chezmoi_init_apply -%}
+      --apply{{ " " }}
+      {%- endif %}
+      {% if item.prompts.bool | default([]) | length >= 1 -%}
+      --promptBool="{{ item.prompts.bool | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {%- endif %}
+      {% if item.prompts.choice | default([]) | length >= 1 -%}
+      --promptChoice="{{ item.prompts.choice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {%- endif %}
+      {% if item.prompts.multichoice | default([]) | length >= 1 -%}
+      --promptMultichoice="{{ item.prompts.multichoice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {%- endif %}
+      {% if item.prompts.string | default([]) | length >= 1 -%}
+      --promptString="{{ item.prompts.string | items2dict | items | map('join', '=') | join(',') }}"
+      {%- endif %}
+  ansible.builtin.command:
+    cmd: chezmoi init {{ _chezmoi_args }} {{ item.repo }}
+  register: _chezmoi_init
+  changed_when: "'cloning' in _chezmoi_init.stderr | lower"
+  become: true
+  become_user: "{{ item.username }}"
+
+- name: "Enable chezmoi update repo systemd timer"
+  become: true
+  become_user: "{{ item.username }}"
+  when: chezmoi_update_time != "never"
+  block:
+    - name: Create systemd user directory
+      ansible.builtin.file:
+        path: "{{ lookup('env', 'HOME') }}/.config/systemd/user/"
+        state: directory
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Add chezmoi update service
+      ansible.builtin.template:
+        src: chezmoi-update.service
+        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-update.service"
+        mode: u=rw,g=r,o=r
+      register: _service_file
+
+    - name: Add chezmoi update systemd timer
+      ansible.builtin.template:
+        src: chezmoi-update.timer
+        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-update.timer"
+        mode: u=rw,g=r,o=r
+      register: _timer_file
+
+    - name: Start and enable chezmoi update systemd timer
+      ansible.builtin.systemd:
+        name: chezmoi-update.timer
+        daemon_reload: >-
+          {{ true if _service_file is changed or _timer_file is changed else false }}
+        scope: user
+        state: started
+        enabled: true
