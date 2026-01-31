@@ -45,22 +45,35 @@ Options (= indicates it is required):
           default: true
           type: bool
 
-- chezmoi_update_args  Extra arguments to use when updating a chezmoi
-                        repo
+- chezmoi_repo_update_args  Extra arguments to use when updating a
+                             chezmoi repo
           default: ''
           type: str
 
-- chezmoi_update_eeprom_randomized_delay  Delay the chezmoi repo
-                                           update timer by a random
-                                           time up to this value or
-                                           empty string for no delay
+- chezmoi_repo_update_randomized_delay  Delay the chezmoi repo update
+                                         timer by a random time up to
+                                         this value or empty string
+                                         for no delay
           default: 6h
           type: str
 
-- chezmoi_update_eeprom_time  How often to update a users chezmoi
-                               repo, accepts a systemd time, see
-                               https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
-                               or "never"
+- chezmoi_repo_update_time  How often to update a users chezmoi repo,
+                             accepts a systemd time, see
+                             https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
+                             or "never"
+          default: daily
+          type: str
+
+- chezmoi_update_randomized_delay  Delay the chezmoi update timer by
+                                    a random time up to this value or
+                                    empty string for no delay
+          default: 6h
+          type: str
+
+- chezmoi_update_time  How often to update chezmoi, accepts a systemd
+                        time, see
+                        https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
+                        or "never"
           default: daily
           type: str
 

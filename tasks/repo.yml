@@ -27,10 +27,10 @@
   become: true
   become_user: "{{ item.username }}"
 
-- name: "Enable chezmoi update repo systemd timer"
+- name: "Enable chezmoi repo update systemd timer"
   become: true
   become_user: "{{ item.username }}"
-  when: chezmoi_update_time != "never"
+  when: chezmoi_repo_update_time != "never"
   block:
     - name: Create systemd user directory
       ansible.builtin.file:
@@ -38,23 +38,23 @@
         state: directory
         mode: u=rwx,g=rx,o=rx
 
-    - name: Add chezmoi update service
+    - name: Add chezmoi repo update service
       ansible.builtin.template:
-        src: chezmoi-update.service
-        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-update.service"
+        src: chezmoi-repo-update.service
+        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-repo-update.service"
         mode: u=rw,g=r,o=r
       register: _service_file
 
-    - name: Add chezmoi update systemd timer
+    - name: Add chezmoi repo update systemd timer
       ansible.builtin.template:
-        src: chezmoi-update.timer
-        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-update.timer"
+        src: chezmoi-repo-update.timer
+        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-repo-update.timer"
         mode: u=rw,g=r,o=r
       register: _timer_file
 
-    - name: Start and enable chezmoi update systemd timer
+    - name: Start and enable chezmoi repo update systemd timer
       ansible.builtin.systemd:
-        name: chezmoi-update.timer
+        name: chezmoi-repo-update.timer
         daemon_reload: >-
           {{ true if _service_file is changed or _timer_file is changed else false }}
         scope: user

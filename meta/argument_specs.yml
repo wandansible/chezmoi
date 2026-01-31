@@ -44,7 +44,22 @@ argument_specs:
         type: bool
         default: true
 
-      chezmoi_update_eeprom_time:
+      chezmoi_update_time:
+        description: |
+          How often to update chezmoi, accepts a systemd time,
+          see https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
+          or "never"
+        type: str
+        default: "daily"
+
+      chezmoi_update_randomized_delay:
+        description: |
+          Delay the chezmoi update timer by a random time up
+          to this value or empty string for no delay
+        type: str
+        default: "6h"
+
+      chezmoi_repo_update_time:
         description: |
           How often to update a users chezmoi repo, accepts a systemd time,
           see https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
@@ -52,14 +67,14 @@ argument_specs:
         type: str
         default: "daily"
 
-      chezmoi_update_eeprom_randomized_delay:
+      chezmoi_repo_update_randomized_delay:
         description: |
           Delay the chezmoi repo update timer by a random time up
           to this value or empty string for no delay
         type: str
         default: "6h"
 
-      chezmoi_update_args:
+      chezmoi_repo_update_args:
         description: Extra arguments to use when updating a chezmoi repo
         type: str
         default: ""

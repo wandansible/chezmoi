@@ -48,3 +48,32 @@
         state: "{{ 'present' if chezmoi_install | bool else 'absent' }}"
       retries: 6
       delay: 15
+
+- name: "Enable chezmoi update systemd timer"
+  when: chezmoi_update_time != "never"
+  block:
+    - name: Add chezmoi update service
+      ansible.builtin.template:
+        src: chezmoi-update.service
+        dest: "/etc/systemd/system/chezmoi-update.service"
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+      register: _service_file
+
+    - name: Add chezmoi update systemd timer
+      ansible.builtin.template:
+        src: chezmoi-update.timer
+        dest: "/etc/systemd/system/chezmoi-update.timer"
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+      register: _timer_file
+
+    - name: Start and enable chezmoi update systemd timer
+      ansible.builtin.systemd:
+        name: chezmoi-update.timer
+        daemon_reload: >-
+          {{ true if _service_file is changed or _timer_file is changed else false }}
+        state: started
+        enabled: true

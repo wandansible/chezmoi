@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 
 [Unit]
-Description="Update chezmoi repo timer"
+Description="Update chezmoi timer"
 
 [Timer]
 Unit=chezmoi-update.service

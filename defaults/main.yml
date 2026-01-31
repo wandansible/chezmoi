@@ -19,6 +19,9 @@ chezmoi_init_apply: "true"
 
 chezmoi_update_time: "daily"
 chezmoi_update_randomized_delay: "6h"
-chezmoi_update_args: ""
+
+chezmoi_repo_update_time: "daily"
+chezmoi_repo_update_randomized_delay: "6h"
+chezmoi_repo_update_args: ""
 
 chezmoi_users: []
