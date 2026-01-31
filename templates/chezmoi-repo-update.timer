@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description="Update chezmoi repo timer"
+
+[Timer]
+Unit=chezmoi-repo-update.service
+OnCalendar={{ chezmoi_repo_update_time }}
+{% if chezmoi_repo_update_randomized_delay != "" %}
+RandomizedDelaySec={{ chezmoi_repo_update_randomized_delay }}
+{% endif %}
+Persistent=true
+
+[Install]
+WantedBy=timers.target
