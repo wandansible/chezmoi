@@ -34,21 +34,21 @@
   block:
     - name: Create systemd user directory
       ansible.builtin.file:
-        path: "{{ lookup('env', 'HOME') }}/.config/systemd/user/"
+        path: "~/.config/systemd/user/"
         state: directory
         mode: u=rwx,g=rx,o=rx
 
     - name: Add chezmoi repo update service
       ansible.builtin.template:
         src: chezmoi-repo-update.service
-        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-repo-update.service"
+        dest: "~/.config/systemd/user/chezmoi-repo-update.service"
         mode: u=rw,g=r,o=r
       register: _service_file
 
     - name: Add chezmoi repo update systemd timer
       ansible.builtin.template:
         src: chezmoi-repo-update.timer
-        dest: "{{ lookup('env', 'HOME') }}/.config/systemd/user/chezmoi-repo-update.timer"
+        dest: "~/.config/systemd/user/chezmoi-repo-update.timer"
         mode: u=rw,g=r,o=r
       register: _timer_file
 
