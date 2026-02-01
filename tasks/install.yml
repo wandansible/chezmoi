@@ -35,7 +35,7 @@
       {{ hostvars["localhost"]["ansible_facts"]["github_chezmoi_release_info"].assets
          | selectattr("name", "search", "chezmoi", ignorecase=true)
          | selectattr("name", "search", "linux", ignorecase=true)
-         | selectattr("name", "search", chezmoi_arch_map[ansible_architecture], ignorecase=true)
+         | selectattr("name", "search", chezmoi_arch_map[ansible_facts['architecture']], ignorecase=true)
          | selectattr("name", "search", "\.deb$")
          | map(attribute='browser_download_url')
          | first
