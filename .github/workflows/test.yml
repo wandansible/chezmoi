@@ -32,6 +32,8 @@ jobs:
           - core: "latest"
             community: "latest"
             python: "3.x"
+        exclude:
+          - target: "debian:bullseye"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6

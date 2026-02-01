@@ -7,3 +7,9 @@
         name: "wandansible.chezmoi"
       vars:
         chezmoi_github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+
+        chezmoi_repo_update_time: "never"
+
+        chezmoi_users:
+          - username: user
+            repo: chezmoi/test-dotfiles
