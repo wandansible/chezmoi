@@ -4,7 +4,7 @@
   delegate_to: localhost
   delegate_facts: true
   when:
-    - "'github_chezmoi_release_info' not in hostvars['localhost']['ansible_facts']"
+    - "'github_chezmoi_release_info' not in hostvars['localhost'].ansible_facts"
   block:
     - name: "Get GitHub release information"
       ansible.builtin.uri:
@@ -32,10 +32,10 @@
 - name: Install chezmoi
   vars:
     _chezmoi_apt_package_url: >-
-      {{ hostvars["localhost"]["ansible_facts"]["github_chezmoi_release_info"].assets
+      {{ hostvars.localhost.ansible_facts.github_chezmoi_release_info.assets
          | selectattr("name", "search", "chezmoi", ignorecase=true)
          | selectattr("name", "search", "linux", ignorecase=true)
-         | selectattr("name", "search", chezmoi_arch_map[ansible_facts['architecture']], ignorecase=true)
+         | selectattr("name", "search", chezmoi_arch_map[ansible_facts.architecture], ignorecase=true)
          | selectattr("name", "search", "\.deb$")
          | map(attribute='browser_download_url')
          | first
