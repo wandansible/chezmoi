@@ -5,7 +5,7 @@ argument_specs:
     options:
       chezmoi_arch_map:
         description: |
-          Mapping of the possible values of ansible_architecture
+          Mapping of the possible values of ansible_facts.architecture
           to the chezmoi package architectures
         type: dict
 
