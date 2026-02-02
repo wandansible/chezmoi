@@ -12,7 +12,7 @@ ENTRY POINT: *main* - Install and configure chezmoi for managing dotfiles
 Options (= indicates it is required):
 
 - chezmoi_arch_map  Mapping of the possible values of
-                     ansible_architecture to the chezmoi package
+                     ansible_facts.architecture to the chezmoi package
                      architectures
           default: null
           type: dict
