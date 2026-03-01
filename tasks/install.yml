@@ -77,3 +77,22 @@
           {{ true if _service_file is changed or _timer_file is changed else false }}
         state: started
         enabled: true
+
+- name: "Disable chezmoi update systemd timer"
+  when: chezmoi_update_time == "never"
+  block:
+    - name: Remove chezmoi update service and timer
+      ansible.builtin.file:
+        path: "/etc/systemd/system/{{ item }}"
+        state: "absent"
+      loop:
+        - "chezmoi-update.service"
+        - "chezmoi-update.timer"
+      register: _remove_files
+
+    - name: Disable chezmoi update systemd timer
+      ansible.builtin.command:
+        cmd: systemctl disable chezmoi-update.timer
+      register: _systemctl_disable
+      changed_when: "'removed' in _systemctl_disable.stderr | lower"
+      when: _remove_files is changed
