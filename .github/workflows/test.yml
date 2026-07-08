@@ -36,7 +36,7 @@ jobs:
           - target: "debian:bullseye"
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup python
         uses: actions/setup-python@v6
         with:
