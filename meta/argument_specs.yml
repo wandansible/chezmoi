@@ -24,6 +24,31 @@ argument_specs:
         type: str
         default: ""
 
+      chezmoi_archive_extension:
+        description: File extension for the chezmoi package archive
+        type: str
+        default: deb
+
+      chezmoi_checksum_filename:
+        description: Filename for the chezmoi package checksums file on github
+        type: str
+        default: checksums.txt
+
+      chezmoi_checksum_type:
+        description: The chezmoi package checksum type
+        type: str
+        default: sha256
+
+      chezmoi_signature_filename:
+        description: Filename for the chezmoi checksums signature file on github
+        type: str
+        default: checksums.txt.sigstore.json
+
+      chezmoi_public_key_filename:
+        description: Filename for the chezmoi public key file on github
+        type: str
+        default: chezmoi_cosign.pub
+
       chezmoi_version:
         description: Version to install (use "latest" for the latest version)
         type: str
@@ -31,6 +56,16 @@ argument_specs:
 
       chezmoi_install:
         description: If true, install chezmoi
+        type: bool
+        default: true
+
+      chezmoi_src_dir:
+        description: Directory for the downloaded chezmoi src archive
+        type: str
+        default: /opt/chezmoi/src
+
+      chezmoi_clean_src_dir:
+        description: Remove old downloaded archive files from chezmoi src directory
         type: bool
         default: true
 

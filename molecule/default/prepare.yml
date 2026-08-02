@@ -5,3 +5,9 @@
     - name: "Create user"
       ansible.builtin.user:
         name: user
+
+    - name: "Install cosign"
+      ansible.builtin.get_url:
+        url: "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64"
+        dest: "/usr/local/bin/cosign"
+        mode: "u=rwx,g=rx,o=rx"

@@ -1,4 +1,14 @@
 ---
+- name: "Create directories"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  loop:
+    - "{{ chezmoi_src_dir }}"
+
 - name: "Get GitHub release information"
   run_once: true
   delegate_to: localhost
@@ -31,23 +41,113 @@
 
 - name: Install chezmoi
   vars:
-    _chezmoi_apt_package_url: >-
+    _chezmoi_archive_url: >-
       {{ hostvars.localhost.ansible_facts.github_chezmoi_release_info.assets
          | selectattr("name", "search", "chezmoi", ignorecase=true)
          | selectattr("name", "search", "linux", ignorecase=true)
          | selectattr("name", "search", chezmoi_arch_map[ansible_facts.architecture], ignorecase=true)
-         | selectattr("name", "search", "\.deb$")
-         | map(attribute='browser_download_url')
+         | selectattr("name", "search", "\."+chezmoi_archive_extension+"$")
+         | map(attribute="browser_download_url")
          | first
          | default(None) }}
+    _chezmoi_archive_filename: "{{ _chezmoi_archive_url | split('/') | last }}"
+    _chezmoi_checksum_url: >-
+      {{ hostvars["localhost"].ansible_facts.github_chezmoi_release_info.assets
+         | selectattr("name", "search", chezmoi_checksum_filename+"$")
+         | map(attribute="browser_download_url")
+         | first
+         | default(None) }}
+    _chezmoi_signature_url: >-
+      {{ hostvars["localhost"].ansible_facts.github_chezmoi_release_info.assets
+         | selectattr("name", "search", chezmoi_signature_filename+"$")
+         | map(attribute="browser_download_url")
+         | first
+         | default(None) }}
+    _chezmoi_public_signature_url: >-
+      {{ hostvars["localhost"].ansible_facts.github_chezmoi_release_info.assets
+         | selectattr("name", "search", chezmoi_public_key_filename+"$")
+         | map(attribute="browser_download_url")
+         | first
+         | default(None) }}
+    _chezmoi_archive_checksums: >-
+      {{ lookup("url", _chezmoi_checksum_url, split_lines=False) }}
+    _chezmoi_archive_checksum: >-
+      {{ _chezmoi_archive_checksums.splitlines()
+         | select("search", "\s"+_chezmoi_archive_filename+"$")
+         | first | default("") | split(" ") | first | default(None) }}
   block:
+    - name: "Create temporary directory"
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: chezmoi
+      changed_when: false
+      register: _chezmoi_tmp_dir
+
+    - name: Check for cosign CLI tool
+      ansible.builtin.command:
+        cmd: cosign version
+      failed_when: false
+      changed_when: false
+      register: _cosign_cli
+
+    - name: Verify cosign signature of archive
+      when: _cosign_cli.rc == 0
+      block:
+        - name: "Download signature file"
+          ansible.builtin.get_url:
+            url: "{{ _chezmoi_signature_url }}"
+            dest: "{{ _chezmoi_tmp_dir.path }}/{{ chezmoi_signature_filename }}"
+            owner: root
+            group: root
+            mode: u=rw,g=r,o=r
+          changed_when: false
+          retries: 6
+          delay: 15
+
+        - name: Verify archive signature
+          ansible.builtin.command:
+            cmd: >-
+              cosign verify-blob
+                     --bundle '{{ _chezmoi_tmp_dir.path }}/{{ chezmoi_signature_filename }}'
+                     --key '{{ _chezmoi_public_signature_url }}'
+                     -
+            stdin: "{{ _chezmoi_archive_checksums }}"
+            stdin_add_newline: false
+          changed_when: false
+
     - name: "Download archive"
+      ansible.builtin.get_url:
+        url: "{{ _chezmoi_archive_url }}"
+        dest: "{{ chezmoi_src_dir }}/{{ _chezmoi_archive_filename }}"
+        checksum: "{{ chezmoi_checksum_type }}:{{ _chezmoi_archive_checksum }}"
+        mode: u=rw,g=r,o=r
+      retries: 6
+      delay: 15
+
+    - name: "Install package"
       ansible.builtin.apt:
-        deb: "{{ _chezmoi_apt_package_url }}"
+        deb: "{{ chezmoi_src_dir }}/{{ _chezmoi_archive_filename }}"
         install_recommends: false
         state: "{{ 'present' if chezmoi_install | bool else 'absent' }}"
       retries: 6
       delay: 15
+
+    - name: Get downloaded archive files
+      ansible.builtin.find:
+        paths: "{{ chezmoi_src_dir }}"
+        patterns: "{{ '*' + _chezmoi_archive_filename | splitext | last }}"
+      register: _chezmoi_src_archives
+
+    - name: Remove older downloaded archive files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _chezmoi_src_archives.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when:
+        - "item.path | basename != _chezmoi_archive_filename"
+        - "chezmoi_clean_src_dir | bool"
 
 - name: "Enable chezmoi update systemd timer"
   when: chezmoi_update_time != "never"

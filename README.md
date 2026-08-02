@@ -17,6 +17,25 @@ Options (= indicates it is required):
           default: null
           type: dict
 
+- chezmoi_archive_extension  File extension for the chezmoi package
+                              archive
+          default: deb
+          type: str
+
+- chezmoi_checksum_filename  Filename for the chezmoi package
+                              checksums file on github
+          default: checksums.txt
+          type: str
+
+- chezmoi_checksum_type  The chezmoi package checksum type
+          default: sha256
+          type: str
+
+- chezmoi_clean_src_dir  Remove old downloaded archive files from
+                          chezmoi src directory
+          default: true
+          type: bool
+
 - chezmoi_github_org  Name of organisation for chezmoi github
                        repository
           default: twpayne
@@ -45,6 +64,11 @@ Options (= indicates it is required):
           default: true
           type: bool
 
+- chezmoi_public_key_filename  Filename for the chezmoi public key
+                                file on github
+          default: chezmoi_cosign.pub
+          type: str
+
 - chezmoi_repo_update_args  Extra arguments to use when updating a
                              chezmoi repo
           default: ''
@@ -62,6 +86,15 @@ Options (= indicates it is required):
                              https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html,
                              or "never"
           default: daily
+          type: str
+
+- chezmoi_signature_filename  Filename for the chezmoi checksums
+                               signature file on github
+          default: checksums.txt.sigstore.json
+          type: str
+
+- chezmoi_src_dir  Directory for the downloaded chezmoi src archive
+          default: /opt/chezmoi/src
           type: str
 
 - chezmoi_update_randomized_delay  Delay the chezmoi update timer by
