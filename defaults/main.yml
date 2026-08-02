@@ -9,10 +9,17 @@ chezmoi_arch_map:
 chezmoi_github_org: twpayne
 chezmoi_github_repo: chezmoi
 chezmoi_github_token: ""
+chezmoi_archive_extension: "deb"
+chezmoi_checksum_filename: checksums.txt
+chezmoi_checksum_type: sha256
+chezmoi_signature_filename: checksums.txt.sigstore.json
+chezmoi_public_key_filename: chezmoi_cosign.pub
 
 chezmoi_version: "latest"
 
 chezmoi_install: "true"
+chezmoi_src_dir: /opt/chezmoi/src
+chezmoi_clean_src_dir: true
 
 chezmoi_init_args: ""
 chezmoi_init_apply: "true"

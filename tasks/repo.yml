@@ -8,28 +8,28 @@
       {% if chezmoi_init_apply -%}
       --apply{{ " " }}
       {%- endif %}
-      {% if item.prompts.bool | default([]) | length >= 1 -%}
-      --promptBool="{{ item.prompts.bool | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {% if user.prompts.bool | default([]) | length >= 1 -%}
+      --promptBool="{{ user.prompts.bool | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
       {%- endif %}
-      {% if item.prompts.choice | default([]) | length >= 1 -%}
-      --promptChoice="{{ item.prompts.choice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {% if user.prompts.choice | default([]) | length >= 1 -%}
+      --promptChoice="{{ user.prompts.choice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
       {%- endif %}
-      {% if item.prompts.multichoice | default([]) | length >= 1 -%}
-      --promptMultichoice="{{ item.prompts.multichoice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
+      {% if user.prompts.multichoice | default([]) | length >= 1 -%}
+      --promptMultichoice="{{ user.prompts.multichoice | items2dict | items | map('join', '=') | join(',') }}"{{ " " }}
       {%- endif %}
-      {% if item.prompts.string | default([]) | length >= 1 -%}
-      --promptString="{{ item.prompts.string | items2dict | items | map('join', '=') | join(',') }}"
+      {% if user.prompts.string | default([]) | length >= 1 -%}
+      --promptString="{{ user.prompts.string | items2dict | items | map('join', '=') | join(',') }}"
       {%- endif %}
   ansible.builtin.command:
-    cmd: chezmoi init {{ _chezmoi_args }} {{ item.repo }}
+    cmd: chezmoi init {{ _chezmoi_args }} {{ user.repo }}
   register: _chezmoi_init
   changed_when: "'cloning' in _chezmoi_init.stderr | lower"
   become: true
-  become_user: "{{ item.username }}"
+  become_user: "{{ user.username }}"
 
 - name: "Enable chezmoi repo update systemd timer"
   become: true
-  become_user: "{{ item.username }}"
+  become_user: "{{ user.username }}"
   when: chezmoi_repo_update_time != "never"
   block:
     - name: Create systemd user directory
