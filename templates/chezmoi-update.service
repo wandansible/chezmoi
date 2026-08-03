@@ -7,6 +7,9 @@ Description="Update chezmoi"
 Type=oneshot
 ExecStart=/usr/bin/chezmoi upgrade
 User=root
+{% if chezmoi_github_token != "" %}
+Environment="CHEZMOI_GITHUB_TOKEN={{ chezmoi_github_token }}"
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
