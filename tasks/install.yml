@@ -69,12 +69,6 @@
          | map(attribute="browser_download_url")
          | first
          | default(None) }}
-    _chezmoi_archive_checksums: >-
-      {{ lookup("url", _chezmoi_checksum_url, split_lines=False) }}
-    _chezmoi_archive_checksum: >-
-      {{ _chezmoi_archive_checksums.splitlines()
-         | select("search", "\s"+_chezmoi_archive_filename+"$")
-         | first | default("") | split(" ") | first | default(None) }}
   block:
     - name: "Create temporary directory"
       ansible.builtin.tempfile:
@@ -82,6 +76,14 @@
         suffix: chezmoi
       changed_when: false
       register: _chezmoi_tmp_dir
+
+    - name: Get archive checksums
+      ansible.builtin.uri:
+        url: "{{ _chezmoi_checksum_url }}"
+        return_content: true
+      register: _chezmoi_archive_checksums
+      retries: 6
+      delay: 15
 
     - name: Check for cosign CLI tool
       ansible.builtin.command:
@@ -111,11 +113,16 @@
                      --bundle '{{ _chezmoi_tmp_dir.path }}/{{ chezmoi_signature_filename }}'
                      --key '{{ _chezmoi_public_signature_url }}'
                      -
-            stdin: "{{ _chezmoi_archive_checksums }}"
+            stdin: "{{ _chezmoi_archive_checksums.content }}"
             stdin_add_newline: false
           changed_when: false
 
     - name: "Download archive"
+      vars:
+        _chezmoi_archive_checksum: >-
+          {{ _chezmoi_archive_checksums.content.splitlines()
+             | select("search", "\s"+_chezmoi_archive_filename+"$")
+             | first | default("") | split(" ") | first | default(None) }}
       ansible.builtin.get_url:
         url: "{{ _chezmoi_archive_url }}"
         dest: "{{ chezmoi_src_dir }}/{{ _chezmoi_archive_filename }}"
